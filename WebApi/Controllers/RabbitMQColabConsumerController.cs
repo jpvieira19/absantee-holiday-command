@@ -12,7 +12,7 @@ namespace WebApi.Controllers
     public class RabbitMQColabConsumerController : IRabbitMQConsumerController
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ConnectionFactory _factory;
+        private readonly IConnectionFactory _factory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
 
@@ -20,10 +20,10 @@ namespace WebApi.Controllers
 
         private string _queueName;
  
-        public RabbitMQColabConsumerController(IServiceScopeFactory scopeFactory)
+        public RabbitMQColabConsumerController(IServiceScopeFactory scopeFactory, IConnectionFactory factory)
         {
             _scopeFactory = scopeFactory;
-            _factory = new ConnectionFactory { HostName = "localhost" };
+            _factory = factory;
             _connection = _factory.CreateConnection();
             _channel = _connection.CreateModel();
 

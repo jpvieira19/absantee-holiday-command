@@ -10,17 +10,17 @@ namespace WebApi.Controllers
     public class RabbitMQHolidayPendingConsumerController : IRabbitMQConsumerController
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ConnectionFactory _factory;
+        private readonly IConnectionFactory _factory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
 
         private List<string> _errorMessages = new List<string>();
         private string _queueName;
  
-        public RabbitMQHolidayPendingConsumerController(IServiceScopeFactory scopeFactory)
+        public RabbitMQHolidayPendingConsumerController(IServiceScopeFactory scopeFactory, IConnectionFactory factory)
         {
             _scopeFactory = scopeFactory;
-            _factory = new ConnectionFactory { HostName = "localhost" };
+            _factory = factory;
             _connection = _factory.CreateConnection();
             _channel = _connection.CreateModel();
  

@@ -5,12 +5,12 @@ namespace Gateway
 {
     public class AssociationVerificationAmqpGateway
     {
-        private readonly ConnectionFactory _factory;
+        private readonly IConnectionFactory _factory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        public AssociationVerificationAmqpGateway()
+        public AssociationVerificationAmqpGateway(IConnectionFactory factory)
         {
-            _factory = new ConnectionFactory { HostName = "localhost" };
+            _factory = factory;
             _connection = _factory.CreateConnection();
             _channel = _connection.CreateModel();
             _channel.ExchangeDeclare(exchange: "associationPendentResponse", type: ExchangeType.Fanout);

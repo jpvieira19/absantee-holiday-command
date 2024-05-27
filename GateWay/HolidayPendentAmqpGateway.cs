@@ -3,12 +3,12 @@ using System.Text;
 using RabbitMQ.Client;
 public class HolidayPendentAmqpGateway
 {
-    private readonly ConnectionFactory _factory;
+    private readonly IConnectionFactory _factory;
     private readonly IConnection _connection;
     private readonly IModel _channel;
-    public HolidayPendentAmqpGateway()
+    public HolidayPendentAmqpGateway(IConnectionFactory factory)
     {
-        _factory = new ConnectionFactory { HostName = "localhost" };
+        _factory = factory;
         _connection = _factory.CreateConnection();
         _channel = _connection.CreateModel();
         _channel.ExchangeDeclare(exchange: "holidayToValidate", type: ExchangeType.Fanout);

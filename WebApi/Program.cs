@@ -6,6 +6,7 @@ using Domain.Factory;
 using Domain.IRepository;
 using WebApi.Controllers;
 using Gateway;
+using RabbitMQ.Client;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Any;
 
@@ -26,6 +27,11 @@ var queueName = config["Commands:" + replicaName];
 //var port = getPort(holidayQueueName);
 
 var port = config["Ports:" + replicaName];
+
+var rabbitMqHost = config["RabbitMq:Host"];
+var rabbitMqPort = config["RabbitMq:Port"];
+var rabbitMqUser = config["RabbitMq:UserName"];
+var rabbitMqPass = config["RabbitMq:Password"];
 
 // Add services to the container.
 
@@ -56,6 +62,17 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
+});
+
+builder.Services.AddSingleton<IConnectionFactory>(sp =>
+{
+    return new ConnectionFactory()
+    {
+        HostName = rabbitMqHost,
+        Port = int.Parse(rabbitMqPort),
+        UserName = rabbitMqUser,
+        Password = rabbitMqPass
+    };
 });
 
 builder.Services.AddTransient<IHolidayRepository, HolidayRepository>();
@@ -93,6 +110,13 @@ builder.Services.AddTransient<HolidayPendingService>();
 
 var app = builder.Build();
 
+var rabbitMQConsumerServices = app.Services.GetServices<IRabbitMQConsumerController>();
+foreach (var service in rabbitMQConsumerServices)
+{
+    service.ConfigQueue(queueName);
+    service.StartConsuming();
+};
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -105,13 +129,6 @@ app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection(); 
 
 app.UseAuthorization();
-
-var rabbitMQConsumerServices = app.Services.GetServices<IRabbitMQConsumerController>();
-foreach (var service in rabbitMQConsumerServices)
-{
-    service.ConfigQueue(queueName);
-    service.StartConsuming();
-};
 
 app.MapControllers();
 
