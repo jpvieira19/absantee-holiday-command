@@ -31,13 +31,12 @@ jobs:
 
       - name: Build
         run: dotnet build Absantee.sln --no-restore --configuration Release
+  tests:
+   runs-on: ubuntu-latest
 
-    tests:
-      runs-on: ubuntu-latest
+   needs: build
 
-      needs: build
-
-    steps:
+   steps:
      - name: Checkout repository
        uses: actions/checkout@v3
 
@@ -53,6 +52,7 @@ jobs:
          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
          restore-keys: |
            ${{ runner.os }}-nuget-
+
      - name: Restore dependencies
        run: dotnet restore Absantee.sln
 
