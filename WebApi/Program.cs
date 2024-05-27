@@ -48,7 +48,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AbsanteeContext>(option =>
 {
     option.UseNpgsql(DBConnectionString);
-}, optionsLifetime: ServiceLifetime.Scoped);
+}, ServiceLifetime.Scoped);
 
 // builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
 // {
