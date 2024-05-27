@@ -50,10 +50,10 @@ builder.Services.AddDbContext<AbsanteeContext>(option =>
     option.UseNpgsql(DBConnectionString);
 }, optionsLifetime: ServiceLifetime.Scoped);
 
-builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
-{
-    options.UseNpgsql(DBConnectionString);
-});
+// builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
+// {
+//     options.UseNpgsql(DBConnectionString);
+// });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
