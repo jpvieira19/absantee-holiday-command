@@ -8,6 +8,8 @@ COPY Application/Application.csproj ./Application/
 COPY DataModel/DataModel.csproj ./DataModel/
 COPY Domain/Domain.csproj ./Domain/
 COPY WebApi/WebApi.csproj ./WebApi/
+COPY WebApi.IntegrationTests/WebApi.IntegrationTests.csproj ./WebApi.IntegrationTests
+COPY Domain.Tests/Domain.Tests.csproj ./Domain.Tests
 
 # Restore dependencies for all projects
 RUN dotnet restore
