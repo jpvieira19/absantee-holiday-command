@@ -1,7 +1,7 @@
 using Application.DTO;
+using DataModel.Repository;
 using Domain.IRepository;
 using Domain.Model;
-using Gateway;
 
 namespace Application.Services
 {

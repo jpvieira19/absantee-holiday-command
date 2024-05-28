@@ -1,4 +1,4 @@
-﻿namespace Gateway;
+﻿namespace DataModel.Repository;
 using System.Text;
 using RabbitMQ.Client;
 public class HolidayAmpqGateway

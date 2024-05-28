@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Application.Services;
 using Application.DTO;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {

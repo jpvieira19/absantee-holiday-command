@@ -1,14 +1,13 @@
-using Microsoft.EntityFrameworkCore;
 using Application.Services;
-using DataModel.Repository;
 using DataModel.Mapper;
+using DataModel.Repository;
 using Domain.Factory;
 using Domain.IRepository;
-using WebApi.Controllers;
-using Gateway;
-using RabbitMQ.Client;
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using WebApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,41 +20,33 @@ if (replicaNameArg != null)
 else
     replicaName = config.GetConnectionString("replicaName");
 
+config.GetConnectionString("replicaName");
+
+replicaName = "Repl1";
 
 var queueName = config["Commands:" + replicaName];
-
-//var port = getPort(holidayQueueName);
-
+ 
 var port = config["Ports:" + replicaName];
 
-var rabbitMqHost = config["RabbitMq:Host"];
-var rabbitMqPort = config["RabbitMq:Port"];
-var rabbitMqUser = config["RabbitMq:UserName"];
-var rabbitMqPass = config["RabbitMq:Password"];
+Console.WriteLine("Environment Development: " + config["ASPNETCORE_ENVIRONMENT"]);
+Console.WriteLine("DB_CONNECTION: " + config["DB_CONNECTION"]);
 
-var DBConnectionString = config.GetConnectionString("DefaultConnection");
+string dbConnectionString = config.DefineDbConnection();
+Console.WriteLine("DBConnectionString: " + dbConnectionString);
 
-// Add services to the container.
+RabbitMqConfiguration rabbitMqConfig = config.DefineRabbitMqConfiguration();
+Console.WriteLine("RabbitMqConfig: " + rabbitMqConfig.Hostname);
+
 
 builder.Services.AddControllers();
 
-// builder.Services.AddDbContext<AbsanteeContext>(opt =>
-//     //opt.UseInMemoryDatabase("AbsanteeList")
-//     //opt.UseSqlite("Data Source=AbsanteeDatabase.sqlite")
-//     opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString(queueName))
-// );
-
 builder.Services.AddDbContext<AbsanteeContext>(option =>
 {
-    option.UseNpgsql(DBConnectionString);
+    option.UseNpgsql(dbConnectionString);
 }, ServiceLifetime.Scoped);
 
-// builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
-// {
-//     options.UseNpgsql(DBConnectionString);
-// });
-
 builder.Services.AddEndpointsApiExplorer();
+ 
 builder.Services.AddSwaggerGen(opt =>
     opt.MapType<DateOnly>(() => new OpenApiSchema
     {
@@ -80,10 +71,9 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 {
     return new ConnectionFactory()
     {
-        HostName = rabbitMqHost,
-        Port = int.Parse(rabbitMqPort),
-        UserName = rabbitMqUser,
-        Password = rabbitMqPass
+        HostName = rabbitMqConfig.Hostname,
+        UserName = rabbitMqConfig.Username,
+        Password = rabbitMqConfig.Password
     };
 });
 
@@ -119,8 +109,11 @@ builder.Services.AddTransient<HolidayPendingService>();
 
 
 
-
 var app = builder.Build();
+
+Console.WriteLine("Environment Development? " + app.Environment.IsDevelopment());
+
+
 
 var rabbitMQConsumerServices = app.Services.GetServices<IRabbitMQConsumerController>();
 foreach (var service in rabbitMQConsumerServices)
@@ -130,13 +123,14 @@ foreach (var service in rabbitMQConsumerServices)
 };
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/*if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("AllowAllOrigins");
+*/
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection(); 
 
@@ -144,7 +138,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run($"https://localhost:{port}");
+Console.WriteLine("Running!");
+
+app.Run();
+//app.Run($"https://localhost:{port}");
 /*
 int getPort(string name)
 {

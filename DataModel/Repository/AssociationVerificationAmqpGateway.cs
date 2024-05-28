@@ -1,7 +1,7 @@
 using System.Text;
 using RabbitMQ.Client;
 
-namespace Gateway
+namespace DataModel.Repository
 {
     public class AssociationVerificationAmqpGateway
     {

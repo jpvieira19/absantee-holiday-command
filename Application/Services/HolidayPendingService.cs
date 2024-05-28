@@ -8,7 +8,6 @@ using DataModel.Repository;
 using Domain.IRepository;
 using Domain.Factory;
 using DataModel.Model;
-using Gateway;
 
 public class HolidayPendingService {
 
