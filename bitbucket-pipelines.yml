@@ -1,0 +1,55 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+pipelines:
+  default:
+    - step:
+        name: Checkout repository
+        caches:
+          - dotnetcore
+        script:
+          - git checkout $BITBUCKET_BRANCH
+          - dotnet restore Absantee.sln
+          - dotnet build Absantee.sln --no-restore --configuration Release
+
+    - step:
+        name: Run Domain Tests
+        services:
+          - docker
+        caches:
+          - dotnetcore
+        script:
+          - export DOCKER_HOST=tcp://localhost:2375
+          - docker version
+          - docker info
+          - pipe: docker://docker/compose:1.29.2
+            variables:
+              DOCKER_HOST: "tcp://localhost:2375"
+              COMPOSE_COMMAND: 'up -d'
+          - dotnet test Absantee.sln --filter FullyQualifiedName~Domain.Tests --configuration Release
+        artifacts:
+          - test-results/**
+
+    - step:
+        name: Run Integration Tests
+        services:
+          - docker
+        caches:
+          - dotnetcore
+        script:
+          - export DOCKER_HOST=tcp://localhost:2375
+          - docker version
+          - docker info
+          - pipe: docker://docker/compose:1.29.2
+            variables:
+              DOCKER_HOST: "tcp://localhost:2375"
+              COMPOSE_COMMAND: 'up -d'
+          - dotnet test Absantee.sln --filter FullyQualifiedName~IntegrationTests --configuration Release
+        artifacts:
+          - test-results/**
+
+definitions:
+  caches:
+    dotnetcore: ~/.nuget/packages
+  services:
+    docker:
+      memory: 2048
