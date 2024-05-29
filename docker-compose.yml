@@ -2,7 +2,7 @@ version: '3.8'
  
 services:
   webapi:
-    image: absantee
+    image: absantee-holiday-command
     build:
       context: .
       dockerfile: Dockerfile
